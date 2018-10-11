@@ -89,10 +89,30 @@ public class SendNotificationTask extends AsyncTask<Void, Void, Void> {
                     .setVibrate(new long[]{0, DEFAULT_VIBRATION})
                     .setExtras(bundle.getBundle("data"));
 
-            if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
                 String group = bundle.getString("group");
                 if (group != null) group = URLDecoder.decode( group, "UTF-8" );
+
                 notification.setGroup(group);
+
+                String groupAlertBehavior = bundle.getString("groupAlertBehavior", "not-set");
+                switch(groupAlertBehavior) {
+                    case "children":
+                        notification.setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_CHILDREN);
+                        break;
+                    case "summary":
+                        notification.setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY);
+                        break;
+                    case "all":
+                        notification.setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_ALL);
+                        break;
+                    default:
+                        break; // Leave default behavior to Android defaults.
+                }
+
+                if (bundle.containsKey("groupSummary") && bundle.getBoolean("groupSummary")) {
+                    notification.setGroupSummary(true);
+                }
             }
 
             if (bundle.containsKey("ongoing") && bundle.getBoolean("ongoing")) {
